@@ -2,7 +2,7 @@
 
 from pegasus_cycles._pegasus import *
 
-a = ADAG("pegasus-cycles")
+a = ADAG("pegasus-cycles", auto=True)
 
 
 @a.job()
