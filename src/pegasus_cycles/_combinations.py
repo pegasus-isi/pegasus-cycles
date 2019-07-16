@@ -71,20 +71,23 @@ coordinates = zip(latitude, longitude, weather)
 # dot product for fertilizers
 fertilizers = zip(nitrogen_rate, fertilizer_rate)
 
-rows = list(
-    product(
-        country,
-        [crop_name],
-        coordinates,
-        soil,
-        start_planting_date,
-        end_planting_date,
-        fertilizer,
-        fertilizers,
-        forcing,
-        planting_date_fixed,
-        weed_fraction,
-        disabled,
-        notes,
-    )
-)
+
+def itercombinations(distinct_locations):
+    for row in list(
+        product(
+            country,
+            [crop_name],
+            distinct_locations,
+            soil,
+            start_planting_date,
+            end_planting_date,
+            fertilizer,
+            fertilizers,
+            forcing,
+            planting_date_fixed,
+            weed_fraction,
+            disabled,
+            notes,
+        )
+    ):
+        yield row
