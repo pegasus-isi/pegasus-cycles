@@ -9,10 +9,11 @@ from netCDF4 import Dataset
 
 
 def iterlocations(location_file):
+    # X is Longitude, Y is Latitude.
     with Path(location_file).open("r") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            yield row["X_c"], row["Y_c"]
+            yield row["LATITUDE"], row["LONGITUDE"]
 
 
 def closest(lat, lon, elevation):
@@ -36,4 +37,4 @@ def closest(lat, lon, elevation):
 
     fname = "met" + lat_str + "x" + lon_str + ".weather"
 
-    return fname
+    return lat, lon, fname
