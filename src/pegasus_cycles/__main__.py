@@ -4,31 +4,49 @@ Pegasus Cycles.
 
 :license: Apache 2.0
 """
+
+import logging
 import sys
+from pathlib import Path
 
 import click
 
 import pegasus_cycles
 from pegasus_cycles._adag import *
-from pegasus_cycles._combinations import latitude, longitude
-
-
-def _closest(lat, lon):
-    pass
+from pegasus_cycles._combinations import itercombinations
+from pegasus_cycles._gldas import closest, iterlocations
 
 
 @click.group()
-def cli():
-    click.echo(f"pegasus-cycles v{pegasus_cycles.__version__}")
+@click.option("--verbose", "-v", default=0, count=True)
+def cli(verbose):
+    logging.basicConfig()
 
 
 @cli.command()
+def version():
+    click.echo(f"{Path(sys.argv[0]).name} v{pegasus_cycles.__version__}")
+
+
+@cli.command()
+@click.option(
+    "--locations",
+    "-l",
+    type=click.Path(file_okay=True, dir_okay=False, readable=True),
+    required=True,
+)
+@click.option(
+    "--elevation",
+    "-e",
+    type=click.Path(file_okay=True, dir_okay=False, readable=True),
+    required=True,
+)
 @click.argument("out", type=click.File("w"), default=sys.stdout)
-def dax(out=sys.stdout):
-    click.secho(f"Generate DAX", fg="green")
+def dax(locations, elevation, out=sys.stdout):
+    logging.info("Genearting weather grids")
     weather = set()
-    for _lat, _lon in zip(latitude, longitude):
-        xy = _closest(_lat, _lon)
+    for _lat, _lon in iterlocations(locations):
+        xy = closest(_lat, _lon, elevation)
         if xy not in weather:
             gldas_to_cycles(_lat, _lon)
             weather.add((_lat, _lon, xy))
@@ -40,3 +58,4 @@ def dax(out=sys.stdout):
     visualize()
 
     a.writeXML(out)
+    click.secho(f"Success", fg="green")
