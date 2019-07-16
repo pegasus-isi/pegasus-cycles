@@ -2,13 +2,14 @@
 
 import csv
 import io
+from pathlib import Path
 
 import numpy as np
 from netCDF4 import Dataset
 
 
 def iterlocations(location_file):
-    with location_file as csvfile:
+    with Path(location_file).open("r") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             yield row["X_c"], row["Y_c"]
