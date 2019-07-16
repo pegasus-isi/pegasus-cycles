@@ -37,4 +37,4 @@ def closest(lat, lon, elevation):
 
     fname = "met" + lat_str + "x" + lon_str + ".weather"
 
-    return lat, lon, fname
+    return fname
