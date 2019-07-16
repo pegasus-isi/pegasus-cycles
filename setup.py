@@ -4,7 +4,7 @@ import os
 
 from setuptools import find_packages, setup
 
-install_requires = ["Click"]
+install_requires = ["Click", "netCDF4"]
 
 
 # Utility function to read the README file.
