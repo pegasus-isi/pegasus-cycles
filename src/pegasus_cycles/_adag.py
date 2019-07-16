@@ -9,7 +9,6 @@ a = ADAG("pegasus-cycles", auto=True)
 @a.resource_info(cpu=2)
 def gldas_to_cycles(lat, lon):
     """Transform GLDAS to Cycles."""
-    print(lat, lon)
     return Job("gldas-to-cycles")
 
 
