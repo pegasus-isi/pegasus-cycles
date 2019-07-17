@@ -43,14 +43,21 @@ def version():
 )
 @click.argument("out", type=click.File("w"), default=sys.stdout)
 def dax(locations, elevation, out=sys.stdout):
-    logging.info("Genearting weather grids")
+    logging.info("Create transformation catalog")
+    baseline_transformation()
+    cycles_transformation()
+    merge_transformation()
+    visualize_transformation()
+
+    logging.info("Generate weather grids")
     weather = set()
     for _lat, _lon in iterlocations(locations):
         xy = closest(_lat, _lon, elevation)
         if xy not in weather:
-            gldas_to_cycles(_lat, _lon)
+            gldas_to_cycles(_lat, _lon, xy)
             weather.add((_lat, _lon, xy))
 
+    logging.info("Run Cycles")
     baseline()
     cycles()
     cycles_plus_10pct_nitrogen()
