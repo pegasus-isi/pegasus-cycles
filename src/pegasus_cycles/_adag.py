@@ -22,6 +22,7 @@ def gldas_to_cycles(
     j.addArguments("--longitude", longitude)
     j.addArguments("--gldas-path", gldas_path)
     j.addArguments("--output", output_file)
+    j.uses(File(output_file), Link.OUTPUT)
     return j
 
 
