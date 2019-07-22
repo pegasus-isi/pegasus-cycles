@@ -2,8 +2,26 @@
 
 from pegasus_cycles._pegasus import *
 
+import os
+
 a = ADAG("pegasus-cycles", auto=True)
 
+# input files
+crops_file = File("crops.crop")
+crops_file.addPFN(PFN("file://" + os.getcwd() + "/data/crops.crop", "local"))
+soil_file = File("pongo.soil")
+soil_file.addPFN(PFN("file://" + os.getcwd() + "/data/pongo.soil", "local"))
+template_weed = File("template-weed.operation")
+template_weed.addPFN(PFN("file://" + os.getcwd() + "/data/template-weed.operation", "local"))
+template_ctrl = File("template.ctrl")
+template_ctrl.addPFN(PFN("file://" + os.getcwd() + "/data/template.ctrl", "local"))
+template_op = File("template.operation")
+template_op.addPFN(PFN("file://" + os.getcwd() + "/data/template.operation", "local"))
+a.addFile(crops_file)
+a.addFile(soil_file)
+a.addFile(template_weed)
+a.addFile(template_ctrl)
+a.addFile(template_op)
 
 @a.job()
 def gldas_to_cycles(
@@ -31,16 +49,56 @@ def gldas_to_cycles(
 def baseline_transformation():
     """Cycles Baseline Transformation."""
     e1 = Executable("cycles-baseline")
-    e1.addPFN(PFN("file://path/run", "a"))
-    e2 = Executable("io.sh")
-    e2.addPFN(PFN("file://path/io.sh", "a"))
-    return [e1, e2]
+    return [e1]
 
 
 @a.job()
-def baseline():
+def baseline(
+        unique_id,
+        crop,
+        start_planting_date,
+        end_planting_date,
+        planting_date_fixed,
+        fertilizer_rate,
+        weed_fraction,
+        forcing,
+        weather_file,
+):
     """Cycles Baseline."""
-    return Job("cycles-baseline")
+    j = Job("cycles-baseline")
+    j.addArguments("--baseline", "True")
+    j.addArguments("--fertilizer-increase", "False")
+    j.addArguments("--id", unique_id)
+    j.addArguments("--crop", crop)
+    j.addArguments("--start-planting-date", start_planting_date)
+    j.addArguments("--end-planting-date", end_planting_date)
+    j.addArguments("--planting-date-fixed", planting_date_fixed)
+    j.addArguments("--fertilizer-rate", fertilizer_rate)
+    j.addArguments("--weed-fraction", weed_fraction)
+    j.addArguments("--forcing", forcing)
+    j.addArguments("--weather-file", weather_file)
+    j.addArguments(crops_file)
+    j.addArguments(soil_file)
+    j.addArguments(template_weed)
+    j.addArguments(template_ctrl)
+    j.addArguments(template_op)
+    j.uses(File(weather_file), Link.INPUT)
+    j.uses(crops_file, Link.INPUT)
+    j.uses(soil_file, Link.INPUT)
+    j.uses(template_weed, Link.INPUT)
+    j.uses(template_ctrl, Link.INPUT)
+    j.uses(template_op, Link.INPUT)
+    j.uses(File("baseline_cycles_crop-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_nitrogen-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_season-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_soilProfile-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_som-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_summary-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_water-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_weatherOutput-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_reinit-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("baseline_cycles_outputs-" + unique_id + ".zip"), Link.OUTPUT)
+    return j
 
 
 @a.transformation()
@@ -55,15 +113,105 @@ def cycles_transformation():
 
 
 @a.job()
-def cycles():
+def cycles(
+        unique_id,
+        crop,
+        start_planting_date,
+        end_planting_date,
+        planting_date_fixed,
+        fertilizer_rate,
+        weed_fraction,
+        forcing,
+        weather_file,
+        reinit_file
+):
     """Cycles."""
-    return Job("cycles")
+    j = Job("cycles")
+    j.addArguments("--baseline", "False")
+    j.addArguments("--fertilizer-increase", "False")
+    j.addArguments("--id", unique_id)
+    j.addArguments("--crop", crop)
+    j.addArguments("--start-planting-date", start_planting_date)
+    j.addArguments("--end-planting-date", end_planting_date)
+    j.addArguments("--planting-date-fixed", planting_date_fixed)
+    j.addArguments("--fertilizer-rate", fertilizer_rate)
+    j.addArguments("--weed-fraction", weed_fraction)
+    j.addArguments("--forcing", forcing)
+    j.addArguments("--weather-file", weather_file)
+    j.addArguments("--reinit-file", reinit_file)
+    j.addArguments(crops_file)
+    j.addArguments(soil_file)
+    j.addArguments(template_weed)
+    j.addArguments(template_ctrl)
+    j.addArguments(template_op)
+    j.uses(File(weather_file), Link.INPUT)
+    j.uses(File(reinit_file), Link.INPUT)
+    j.uses(crops_file, Link.INPUT)
+    j.uses(soil_file, Link.INPUT)
+    j.uses(template_weed, Link.INPUT)
+    j.uses(template_ctrl, Link.INPUT)
+    j.uses(template_op, Link.INPUT)
+    j.uses(File("cycles_crop-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_nitrogen-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_season-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_soilProfile-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_som-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_summary-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_water-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_weatherOutput-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_outputs-" + unique_id + ".zip"), Link.OUTPUT)
+    return j
 
 
 @a.job()
-def cycles_plus_10pct_nitrogen():
+def cycles_plus_10pct_nitrogen(
+        unique_id,
+        crop,
+        start_planting_date,
+        end_planting_date,
+        planting_date_fixed,
+        fertilizer_rate,
+        weed_fraction,
+        forcing,
+        weather_file,
+        reinit_file
+    ):
     """Cycles Plus 10 Percent Nitrogen."""
-    return Job("cycles")
+    j = Job("cycles-plus-10pct-nitrogen")
+    j.addArguments("--baseline", "False")
+    j.addArguments("--fertilizer-increase", "True")
+    j.addArguments("--id", unique_id)
+    j.addArguments("--crop", crop)
+    j.addArguments("--start-planting-date", start_planting_date)
+    j.addArguments("--end-planting-date", end_planting_date)
+    j.addArguments("--planting-date-fixed", planting_date_fixed)
+    j.addArguments("--fertilizer-rate", fertilizer_rate)
+    j.addArguments("--weed-fraction", weed_fraction)
+    j.addArguments("--forcing", forcing)
+    j.addArguments("--weather-file", weather_file)
+    j.addArguments("--reinit-file", reinit_file)
+    j.addArguments(crops_file)
+    j.addArguments(soil_file)
+    j.addArguments(template_weed)
+    j.addArguments(template_ctrl)
+    j.addArguments(template_op)
+    j.uses(File(weather_file), Link.INPUT)
+    j.uses(File(reinit_file), Link.INPUT)
+    j.uses(crops_file, Link.INPUT)
+    j.uses(soil_file, Link.INPUT)
+    j.uses(template_weed, Link.INPUT)
+    j.uses(template_ctrl, Link.INPUT)
+    j.uses(template_op, Link.INPUT)
+    j.uses(File("cycles_crop-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_nitrogen-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_season-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_soilProfile-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_som-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_summary-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_water-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_weatherOutput-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(File("cycles_outputs-" + unique_id + ".zip"), Link.OUTPUT)
+    return j
 
 
 @a.transformation()
