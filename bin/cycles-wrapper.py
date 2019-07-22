@@ -86,7 +86,6 @@ def _launch(prefix, baseline, unique_id, **kwargs):
         print("Output: \n{}\n".format(output))
 
 
-
 def _prepare_outputs(prefix, baseline, fertilizer_increase, unique_id, crop, **kwargs):
     shutil.copyfile("./output/" + prefix + "cycles_" + unique_id + "/annualSoilProfileC.dat", prefix + "cycles_soilProfile-" + unique_id + ".dat")
     shutil.copyfile("./output/" + prefix + "cycles_" + unique_id + "/annualSOM.dat", prefix + "cycles_som-" + unique_id + ".dat")
@@ -100,10 +99,11 @@ def _prepare_outputs(prefix, baseline, fertilizer_increase, unique_id, crop, **k
         shutil.copyfile("./output/" + prefix + "cycles_" + unique_id + "/reinit.dat", prefix + "cycles_reinit-" + unique_id + ".dat")
 
     # generate zip for input/output folder
-    os.mkdir(prefix + "cycles_" + unique_id)
-    shutil.move("input", prefix + "cycles_" + unique_id + "/input")
-    shutil.move("output", prefix + "cycles_" + unique_id + "/output")
-    shutil.make_archive(prefix + "cycles_outputs-" + unique_id, 'zip', prefix + "cycles_" + unique_id)
+    outputs_folder = crop.lower() + "_" + prefix + "cycles_" + unique_id
+    os.mkdir(outputs_folder)
+    shutil.move("input", outputs_folder + "/input")
+    shutil.move("output", outputs_folder + "/output")
+    shutil.make_archive(prefix + "cycles_outputs-" + unique_id, 'zip', outputs_folder)
 
 
 def _main():

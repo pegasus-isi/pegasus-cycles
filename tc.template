@@ -3,7 +3,7 @@ cont cycles-cont {
   image "/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha"
 }
 
-tr cycles-baseline {
+tr baseline_cycles {
   site condor_pool {
     type "STAGEABLE"
     container "cycles-cont"
@@ -21,7 +21,7 @@ tr cycles {
   }
 }
 
-tr cycles-plus-10pct-nitrogen {
+tr fertilizer_increase_cycles {
   site condor_pool {
     type "STAGEABLE"
     container "cycles-cont"
