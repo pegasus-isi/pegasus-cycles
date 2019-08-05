@@ -14,12 +14,26 @@
       </directory>
    </site>
 
+   <site handle="osg" arch="x86_64" os="linux">
+       <profile namespace="pegasus" key="data.configuration">condorio</profile>
+       <profile namespace="pegasus" key="style">condor</profile>
+       <profile namespace="condor" key="universe">vanilla</profile>
+       <profile namespace="condor" key="request_memory">2 GB</profile>
+       <profile namespace="condor" key="request_disk">40 GB</profile>
+       <profile namespace="condor" key="+ProjectName" >"mint"</profile>
+       <profile namespace="condor" key="requirements" >regexp("workflow.isi.edu", Machine)</profile>
+       <profile namespace="condor" key="periodic_remove">(JobStatus == 5 &amp;&amp; (CurrentTime - EnteredCurrentStatus) &gt; 120)</profile>
+   </site>
+
+
+
    <site handle="condor_pool" arch="x86_64" os="LINUX">
       <!-- These profiles tell Pegasus that the site is a plain Condor pool -->
       <profile namespace="condor" key="universe">vanilla</profile>
       <profile namespace="pegasus" key="style">condor</profile>
       <profile namespace="pegasus" key="data.configuration">condorio</profile>
 
-      <!--profile namespace="pegasus" key="clusters.size">32</profile-->
+      <!-- This profile tells Pegasus where the worker package is installed on PegasusVM -->
+      <profile namespace="env" key="PEGASUS_HOME">/usr</profile>
    </site>
 </sitecatalog>
