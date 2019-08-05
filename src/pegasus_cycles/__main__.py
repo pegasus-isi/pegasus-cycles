@@ -17,7 +17,7 @@ from pegasus_cycles._combinations import itercombinations
 from pegasus_cycles._gldas import closest, iterlocations
 
 
-@click.group()
+@click.group() 
 @click.option("--verbose", "-v", default=0, count=True)
 def cli(verbose):
     logging.basicConfig()
