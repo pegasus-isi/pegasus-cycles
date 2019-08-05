@@ -19,5 +19,7 @@ def _generate_tc():
 
 
 if __name__ == '__main__':
+    logging.info("Create transformation catalog")
     _generate_tc()
+
     dax()

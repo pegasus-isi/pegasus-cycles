@@ -29,7 +29,7 @@ def gldas_to_cycles(
     longitude,
     output_file,
     start_date="2000-01-01",
-    end_date="2019-03-01",
+    end_date="2017-12-31",
     gldas_path="hard-coded",
 ):
     """Transform GLDAS to Cycles."""
