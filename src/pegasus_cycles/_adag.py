@@ -3,6 +3,7 @@
 from pegasus_cycles._pegasus import *
 
 import os
+import html
 
 a = ADAG("pegasus-cycles", auto=True)
 
@@ -34,7 +35,7 @@ def gldas_to_cycles(
 ):
     """Transform GLDAS to Cycles."""
     j = Job("gldas-to-cycles")
-    j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value="&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;"))
+    j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha\&quot;")))
     j.addArguments("--start-date", start_date)
     j.addArguments("--end-date", end_date)
     j.addArguments("--latitude", latitude)
@@ -82,7 +83,7 @@ def cycles(
     """Cycles."""
     prefix = "baseline_" if baseline else "fertilizer_increase_" if fertilizer_increase else ""
     j = Job(prefix + "cycles")
-    j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value="&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;"))
+    j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha\&quot;")))
     j.addArguments("--baseline", str(baseline))
     j.addArguments("--fertilizer-increase", str(fertilizer_increase))
     j.addArguments("--id", unique_id)
