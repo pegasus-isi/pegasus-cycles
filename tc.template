@@ -9,7 +9,6 @@ tr baseline_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile condor "+SingularityImage" "/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha"
     profile pegasus "clusters.size" "1"
   }
 }
@@ -18,7 +17,6 @@ tr cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile condor "+SingularityImage" "/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha"
     profile pegasus "clusters.size" "1"
   }
 }
@@ -27,7 +25,6 @@ tr fertilizer_increase_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile condor "+SingularityImage" "/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha"
     profile pegasus "clusters.size" "1"
   }
 }
@@ -36,7 +33,6 @@ tr gldas-to-cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/GLDAS-Cycles-transformation.py"
-    profile condor "+SingularityImage" "/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha"
     profile pegasus "clusters.size" "1"
   }
 }
