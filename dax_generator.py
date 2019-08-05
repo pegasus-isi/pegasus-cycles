@@ -14,12 +14,11 @@ def _generate_tc():
             "work_dir": os.getcwd()
         }
         result = src.substitute(tc_data)
-        with open("tc", "w") as f:
+        with open("tc.txt", "w") as f:
             f.write(result)
 
 
 if __name__ == '__main__':
     logging.info("Create transformation catalog")
     _generate_tc()
-
     dax()

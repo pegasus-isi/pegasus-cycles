@@ -1,6 +1,7 @@
 cont cycles-cont {
   type "singularity"
-  image "/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha"
+  image "file:///cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha"
+  image_site "condor_pool"
 }
 
 tr baseline_cycles {
