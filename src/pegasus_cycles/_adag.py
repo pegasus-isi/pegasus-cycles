@@ -31,7 +31,7 @@ def gldas_to_cycles(
     output_file,
     start_date="2000-01-01",
     end_date="2017-12-31",
-    gldas_path="/gldas-data",
+    gldas_path="/raw-data/GLDAS",
 ):
     """Transform GLDAS to Cycles."""
     j = Job("gldas-to-cycles")
