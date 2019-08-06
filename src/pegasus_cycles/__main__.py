@@ -5,16 +5,16 @@ Pegasus Cycles.
 :license: Apache 2.0
 """
 
+import click
 import hashlib
 import logging
-import sys
-from pathlib import Path
-
-import click
-
 import pegasus_cycles
+import sys
+
+from pathlib import Path
 from pegasus_cycles._adag import *
 from pegasus_cycles._combinations import itercombinations
+from pegasus_cycles._combinations import crops
 from pegasus_cycles._gldas import closest, iterlocations
 
 
@@ -44,12 +44,6 @@ def version():
 )
 @click.argument("out", type=click.File("w"), default=sys.stdout)
 def dax(locations, elevation, out=sys.stdout):
-    # logging.info("Create transformation catalog")
-    # baseline_transformation()
-    # cycles_transformation()
-    # merge_transformation()
-    # visualize_transformation()
-
     logging.info("Generate weather grids")
     weather = set()
     for _lat, _lon in iterlocations(locations):
@@ -114,6 +108,9 @@ def dax(locations, elevation, out=sys.stdout):
 
         # merge()
         # visualize()
+
+    for crop in crops:
+        cycles_output_parser(crop)
 
     a.writeXML(out)
     click.secho(f"Success", fg="green")

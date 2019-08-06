@@ -7,7 +7,6 @@ from string import Template
 
 
 def _generate_tc():
-    print("TC")
     with open("tc.template") as t_tc_file:
         src = Template(t_tc_file.read())
         tc_data = {

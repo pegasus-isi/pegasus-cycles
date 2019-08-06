@@ -22,10 +22,18 @@ tr fertilizer_increase_cycles {
   }
 }
 
-tr gldas-to-cycles {
+tr gldas_to_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/GLDAS-Cycles-transformation.py"
+    profile pegasus "clusters.size" "1"
+  }
+}
+
+tr cycles_output_parser {
+  site condor_pool {
+    type "STAGEABLE"
+    pfn "file://$work_dir/bin/cycles-output-parser.py"
     profile pegasus "clusters.size" "1"
   }
 }

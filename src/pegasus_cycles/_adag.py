@@ -24,6 +24,11 @@ a.addFile(template_weed)
 a.addFile(template_ctrl)
 a.addFile(template_op)
 
+# Cycles' season output files list
+season_files = {}
+params_files = {}
+
+
 @a.job()
 def gldas_to_cycles(
     latitude,
@@ -34,7 +39,7 @@ def gldas_to_cycles(
     gldas_path="/raw-data/GLDAS",
 ):
     """Transform GLDAS to Cycles."""
-    j = Job("gldas-to-cycles")
+    j = Job("gldas_to_cycles")
     j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;")))
     j.addArguments("--start-date", start_date)
     j.addArguments("--end-date", end_date)
@@ -82,6 +87,8 @@ def cycles(
 ):
     """Cycles."""
     prefix = "baseline_" if baseline else "fertilizer_increase_" if fertilizer_increase else ""
+    params_file = File(prefix + "cycles_params-" + unique_id + ".csv")
+    season_output_file = File(prefix + "cycles_season-" + unique_id + ".dat")
     j = Job(prefix + "cycles")
     j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;")))
     j.addArguments("--baseline", str(baseline))
@@ -95,6 +102,7 @@ def cycles(
     j.addArguments("--weed-fraction", weed_fraction)
     j.addArguments("--forcing", forcing)
     j.addArguments("--weather-file", weather_file)
+    j.addArguments("--params-file", params_file)
     j.addArguments(crops_file)
     j.addArguments(soil_file)
     j.addArguments(template_weed)
@@ -108,18 +116,43 @@ def cycles(
     j.uses(template_op, Link.INPUT)
     j.uses(File(prefix + "cycles_crop-" + unique_id + ".dat"), Link.OUTPUT)
     j.uses(File(prefix + "cycles_nitrogen-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(File(prefix + "cycles_season-" + unique_id + ".dat"), Link.OUTPUT)
+    j.uses(season_output_file, Link.OUTPUT)
     j.uses(File(prefix + "cycles_soilProfile-" + unique_id + ".dat"), Link.OUTPUT)
     j.uses(File(prefix + "cycles_som-" + unique_id + ".dat"), Link.OUTPUT)
     j.uses(File(prefix + "cycles_summary-" + unique_id + ".dat"), Link.OUTPUT)
     j.uses(File(prefix + "cycles_water-" + unique_id + ".dat"), Link.OUTPUT)
     j.uses(File(prefix + "cycles_weatherOutput-" + unique_id + ".dat"), Link.OUTPUT)
     j.uses(File(prefix + "cycles_outputs-" + unique_id + ".zip"), Link.OUTPUT)
+    j.uses(params_file, Link.OUTPUT)
     if not baseline:
         j.addArguments("--reinit-file", reinit_file)
         j.uses(File(reinit_file), Link.INPUT)
+        if not fertilizer_increase:
+            if crop not in season_files:
+                season_files[crop] = []
+                params_files[crop] = []
+            season_files[crop].append(season_output_file)
+            params_files[crop].append(params_file)
     else:
         j.uses(File(prefix + "cycles_reinit-" + unique_id + ".dat"), Link.OUTPUT)
+    return j
+
+
+@a.job()
+def cycles_output_parser(crop):
+    """Cycles Output Parser."""
+    j = Job("cycles_output_parser")
+    j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;")))
+    output_file = File("cycles_output_summary_" + crop.lower() + ".csv")
+    if crop not in season_files: # temp
+        return
+    for f in season_files[crop]:
+        j.uses(f, Link.INPUT)
+    for f in params_files[crop]:
+        j.addArguments("-p", f)
+        j.uses(f, Link.INPUT)
+    j.uses(output_file, Link.OUTPUT)
+    j.addArguments("--output-file", output_file)
     return j
 
 

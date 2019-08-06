@@ -2,6 +2,7 @@
 """Cycles Executor."""
 
 import argparse
+import csv
 import logging
 import os
 import shutil
@@ -12,7 +13,58 @@ from string import Template
 log = logging.getLogger()
 
 
-def _generate_inputs(prefix, start_year, end_year, baseline, fertilizer_increase, unique_id, crop, start_planting_date, end_planting_date, planting_date_fixed, fertilizer_rate, weed_fraction, forcing, weather_file, reinit_file, crop_file, soil_file, template_weed, template_ctrl, template_op, **kwargs):
+def _generate_inputs(
+        prefix,
+        start_year,
+        end_year,
+        baseline,
+        fertilizer_increase,
+        unique_id,
+        crop,
+        start_planting_date,
+        end_planting_date,
+        planting_date_fixed,
+        fertilizer_rate,
+        weed_fraction,
+        forcing,
+        weather_file,
+        reinit_file,
+        crop_file,
+        soil_file,
+        template_weed,
+        template_ctrl,
+        template_op,
+        params_file,
+        **kwargs):
+
+    # write params file
+    with open(params_file, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow([
+            'unique_id',
+            'crop',
+            'location',
+            'start_planting_date',
+            'end_planting_date',
+            'planting_date_fixed',
+            'nitrogen_rate',
+            'weed_fraction',
+            'forcing',
+            'season_file'
+        ])
+        csvwriter.writerow([
+            unique_id,
+            crop,
+            weather_file.replace('.weather', '').replace('met', '').replace('x', ' x ').replace('N', ' North').replace('E', ' East'),
+            start_planting_date,
+            end_planting_date,
+            planting_date_fixed,
+            fertilizer_rate,
+            weed_fraction,
+            forcing,
+            "cycles_season-" + unique_id + ".dat"
+        ])
+
     os.mkdir("input")
     ctrl_file = prefix + "cycles_" + unique_id + ".ctrl"
     op_file = prefix + "cycles_" + unique_id + ".operation"
@@ -124,6 +176,7 @@ def _main():
     parser.add_argument("-f", "--forcing", dest="forcing", default=False, help="Whether it uses forcing data from PIHM")
     parser.add_argument("-l", "--weather-file", dest="weather_file", default=None, help="Weather file")
     parser.add_argument("-r", "--reinit-file", dest="reinit_file", default=None, help="Cycles reinitialization file")
+    parser.add_argument("-m", "--params-file", dest="params_file", default=None, help="Cycles parameters file")
     parser.add_argument("crop_file", help="crops file")
     parser.add_argument("soil_file", help="Soil file")
     parser.add_argument("template_weed", help="Template weed file")
