@@ -103,8 +103,8 @@ def dax(locations, elevation, out=sys.stdout):
             fertilizer_increase=True
         )
         count += 1
-        if count == 2:
-            break
+        # if count == 2:
+        #     break
 
         # merge()
         # visualize()

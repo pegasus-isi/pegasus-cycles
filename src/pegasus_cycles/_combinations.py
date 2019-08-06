@@ -5,7 +5,8 @@ from itertools import product
 country = ["South Sudan"]
 
 # "Cassava"
-crops = ["Maize", "Sorghum", "Peanut", "Sesame"]
+# crops = ["Maize", "Sorghum", "Peanut", "Sesame", "Cassava"]
+crops = ["Maize", "Sorghum"]
 
 soil = ["pongo.soil"]
 
@@ -24,7 +25,7 @@ fertilizer_rate = ["0.00", "78.13", "156.25", "312.50", "625.00", "1250.00"]
 # forcing = ["True", "False"]
 forcing = ["False"]
 
-weed_fraction = ["0.0", "0.05", "0.1", "0.2", "0.4"]
+weed_fraction = ["0.0", "0.05", "0.1", "0.2", "0.4", "1.5", "2.0"]
 
 # dot product for fertilizers
 fertilizers = zip(nitrogen_rate, fertilizer_rate)
