@@ -22,31 +22,31 @@ def parse_outputs(output_file, params_files, **kwargs):
             'forcing'
         ])
 
-    for f in params_files:
-        params = []
-        with open(f) as params:
-            reader = csv.reader(sm, skipinitialspace=True, quotechar="'")
-            for row in reader:
-                params = row
+        for f in params_files:
+            params = []
+            with open(f) as params:
+                reader = csv.reader(params, skipinitialspace=True, quotechar="'")
+                for row in reader:
+                    params = row.copy()
 
-        with open(params[9]) as season_file:
-            csvreader = csv.reader(season_file, delimiter='\t')
-            next(csvreader)
-            next(csvreader)
-            for row in csvreader:
-                csvwriter.writerow([
-                    params[0],
-                    params[1],
-                    params[2],
-                    params[3],
-                    params[4],
-                    params[5],
-                    params[6],
-                    params[7],
-                    row[0][:4],
-                    row[4],
-                    params[8]
-                    ])
+            with open(params[9]) as season_file:
+                csvreader = csv.reader(season_file, delimiter='\t')
+                next(csvreader)
+                next(csvreader)
+                for row in csvreader:
+                    csvwriter.writerow([
+                        params[0],
+                        params[1],
+                        params[2],
+                        params[3],
+                        params[4],
+                        params[5],
+                        params[6],
+                        params[7],
+                        row[0][:4],
+                        row[4],
+                        params[8]
+                        ])
 
 
 def _main():
