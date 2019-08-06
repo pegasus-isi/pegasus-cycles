@@ -2,7 +2,7 @@ tr baseline_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile pegasus "clusters.size" "2"
+    profile pegasus "clusters.size" "10"
   }
 }
 
@@ -10,7 +10,7 @@ tr cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile pegasus "clusters.size" "2"
+    profile pegasus "clusters.size" "10"
   }
 }
 
@@ -18,7 +18,7 @@ tr fertilizer_increase_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile pegasus "clusters.size" "2"
+    profile pegasus "clusters.size" "10"
   }
 }
 
@@ -26,7 +26,7 @@ tr gldas_to_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/GLDAS-Cycles-transformation.py"
-    profile pegasus "clusters.size" "2"
+    profile pegasus "clusters.size" "1"
   }
 }
 

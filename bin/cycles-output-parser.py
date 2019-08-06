@@ -17,9 +17,25 @@ def parse_outputs(output_file, params_files, **kwargs):
             'planting_date_fixed',
             'nitrogen_rate',
             'weed_fraction',
-            'year',
-            'yield',
             'forcing'
+            'year',
+            'total_biomass',
+            'root_biomass',
+            'grain_yield',
+            'forage_yield',
+            'ag_residue',
+            'harvest_index',
+            'potential_tr',
+            'actual_tr',
+            'soil_evap',
+            'total_n',
+            'root_n',
+            'grain_n',
+            'forage_n',
+            'cum_n_stress',
+            'n_in_harvest',
+            'n_in_residue',
+            'n_concn_forage'
         ])
 
         for f in params_files:
@@ -43,9 +59,17 @@ def parse_outputs(output_file, params_files, **kwargs):
                         params[5],
                         params[6],
                         params[7],
-                        row[0][:4],
-                        row[4],
-                        params[8]
+                        params[8],
+                        row[0][:4].strip(),
+                        row[2].strip(),
+                        row[3].strip(),
+                        row[4].strip(),
+                        row[5].strip(),
+                        row[6].strip(),
+                        row[7].strip(),
+                        row[8].strip(),
+                        row[9].strip(),
+                        row[10].strip(),
                         ])
 
 
