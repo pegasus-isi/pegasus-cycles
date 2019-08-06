@@ -6,7 +6,7 @@ import csv
 import os
 
 def parse_outputs(output_file, params_files, **kwargs):
-    with open('output-summary.csv', 'w', newline='') as csvfile:
+    with open(output_file, 'w', newline='') as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow([
             'unique_id',
