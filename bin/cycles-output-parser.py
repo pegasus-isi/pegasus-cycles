@@ -70,6 +70,14 @@ def parse_outputs(output_file, params_files, **kwargs):
                         row[8].strip(),
                         row[9].strip(),
                         row[10].strip(),
+                        row[11].strip(),
+                        row[12].strip(),
+                        row[13].strip(),
+                        row[14].strip(),
+                        row[15].strip(),
+                        row[16].strip(),
+                        row[17].strip(),
+                        row[18].strip()
                         ])
 
 
