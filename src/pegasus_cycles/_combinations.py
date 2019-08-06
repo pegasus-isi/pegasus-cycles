@@ -22,7 +22,7 @@ nitrogen_rate = ["0", "25", "50", "100", "200", "400"]
 fertilizer_rate = ["0.00", "78.13", "156.25", "312.50", "625.00", "1250.00"]
 
 # forcing = ["True", "False"]
-forcing = [False"]
+forcing = ["False"]
 
 weed_fraction = ["0.0", "0.05", "0.1", "0.2", "0.4"]
 
