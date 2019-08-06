@@ -17,7 +17,7 @@ def parse_outputs(output_file, params_files, **kwargs):
             'planting_date_fixed',
             'nitrogen_rate',
             'weed_fraction',
-            'forcing'
+            'forcing',
             'year',
             'total_biomass',
             'root_biomass',
