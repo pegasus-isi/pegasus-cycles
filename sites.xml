@@ -28,6 +28,9 @@
 
 
    <site handle="condor_pool" arch="x86_64" os="LINUX">
+      <directory type="shared-scratch" path="/data/scratch/pegasus/scratch">
+        <file-server operation="all" url="file:///data/scratch/pegasus/scratch"/>
+      </directory>
       <!-- These profiles tell Pegasus that the site is a plain Condor pool -->
       <profile namespace="condor" key="universe">vanilla</profile>
       <profile namespace="pegasus" key="style">condor</profile>
