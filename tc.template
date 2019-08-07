@@ -2,7 +2,7 @@ tr baseline_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile pegasus "clusters.size" "10"
+    profile pegasus "clusters.size" "50"
   }
 }
 
@@ -10,7 +10,7 @@ tr cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile pegasus "clusters.size" "10"
+    profile pegasus "clusters.size" "50"
   }
 }
 
@@ -18,7 +18,7 @@ tr fertilizer_increase_cycles {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-wrapper.py"
-    profile pegasus "clusters.size" "10"
+    profile pegasus "clusters.size" "50"
   }
 }
 

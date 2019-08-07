@@ -27,11 +27,11 @@ forcing = ["False"]
 
 weed_fraction = ["0.0", "0.05", "0.1", "0.2", "0.4", "1.5", "2.0"]
 
-# dot product for fertilizers
-fertilizers = zip(nitrogen_rate, fertilizer_rate)
-
 
 def itercombinations(distinct_locations):
+    # dot product for fertilizers
+    fertilizers = zip(nitrogen_rate, fertilizer_rate)
+    
     for row in list(
         product(
             country,

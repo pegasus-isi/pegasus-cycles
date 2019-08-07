@@ -29,7 +29,7 @@ season_files = {}
 params_files = {}
 
 
-@a.job()
+# @a.job()
 def gldas_to_cycles(
     latitude,
     longitude,
@@ -70,7 +70,7 @@ def cycles_transformation():
     return [e1, e2]
 
 
-@a.job()
+# @a.job()
 def cycles(
         unique_id,
         crop,
@@ -83,7 +83,8 @@ def cycles(
         weather_file,
         reinit_file=None,
         baseline=False,
-        fertilizer_increase=False
+        fertilizer_increase=False,
+        weather=None
 ):
     """Cycles."""
     prefix = "baseline_" if baseline else "fertilizer_increase_" if fertilizer_increase else ""
@@ -128,27 +129,30 @@ def cycles(
         j.addArguments("--reinit-file", reinit_file)
         j.uses(File(reinit_file), Link.INPUT)
         if not fertilizer_increase:
-            if crop not in season_files:
-                season_files[crop] = []
-                params_files[crop] = []
-            season_files[crop].append(season_output_file)
-            params_files[crop].append(params_file)
+            if weather not in season_files:
+                season_files[weather] = {}
+                params_files[weather] = {}
+            if crop not in season_files[weather]:
+                season_files[weather][crop] = []
+                params_files[weather][crop] = []
+            season_files[weather][crop].append(season_output_file)
+            params_files[weather][crop].append(params_file)
     else:
         j.uses(File(prefix + "cycles_reinit-" + unique_id + ".dat"), Link.OUTPUT)
     return j
 
 
-@a.job()
-def cycles_output_parser(crop):
+# @a.job()
+def cycles_output_parser(weather, crop):
     """Cycles Output Parser."""
+    if weather not in season_files or crop not in season_files[weather]: #temp
+        return
     j = Job("cycles_output_parser")
     j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;")))
-    output_file = File("cycles_output_summary_" + crop.lower() + ".csv")
-    if crop not in season_files: # temp
-        return
-    for f in season_files[crop]:
+    output_file = File("cycles_output_summary_" + crop.lower() + "_" + weather[2].replace("met", "").replace(".weather", "") + ".csv")
+    for f in season_files[weather][crop]:
         j.uses(f, Link.INPUT)
-    for f in params_files[crop]:
+    for f in params_files[weather][crop]:
         j.addArguments("-p", f)
         j.uses(f, Link.INPUT)
     j.uses(output_file, Link.OUTPUT)
