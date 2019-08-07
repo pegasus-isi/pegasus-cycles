@@ -59,7 +59,7 @@ def dax(locations, elevation, out=sys.stdout):
     prev_subwf_job = None
 
     for _w in weather:
-        subwf_id = "subwf_" + _w[2].replace("met", "").replace(".weather", "")
+        subwf_id = "subwf_" + _w[2].replace("met", "").replace(".weather", "").replace(".", "_")
         subwf = ADAG(subwf_id)
 
         # GLDAS to Cycles job
@@ -137,7 +137,7 @@ def dax(locations, elevation, out=sys.stdout):
                      "--sites", "condor_pool",
                      "--output-site", "local",
                      "--cluster", "horizontal",
-                     "--cleanup", "inplace")
+                     "--cleanup", "leaf")
         a.addDAX(subwf_job)
 
         # add depenency for previous subworkflow
