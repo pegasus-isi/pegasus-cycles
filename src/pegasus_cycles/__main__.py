@@ -56,6 +56,8 @@ def dax(locations, elevation, out=sys.stdout):
     # generate subworkflow per location
     logging.info("Generating subworkflows")
     os.mkdir("subwfs")
+    prev_subwf_job = None
+
     for _w in weather:
         subwf_id = "subwf_" + _w[2].replace("met", "").replace(".weather", "")
         subwf = ADAG(subwf_id)
@@ -120,7 +122,7 @@ def dax(locations, elevation, out=sys.stdout):
         for crop in crops:
             subwf.addJob(cycles_output_parser(_w, crop))
 
-        # write sub workflow DAX file
+        # write subworkflow DAX file
         with open("subwfs/" + subwf_id + ".xml", "w") as subwf_out:
             subwf.writeXML(subwf_out)
 
@@ -128,7 +130,7 @@ def dax(locations, elevation, out=sys.stdout):
         subwf_dax.addPFN(PFN("file://" + os.getcwd() + "/subwfs/" + subwf_id + ".xml", "local"))
         a.addFile(subwf_dax)
 
-        subwf_job = DAX(subwf_id + ".xml")
+        subwf_job = DAX(subwf_id + ".xml", id=subwf_id)
         subwf_job.addProfile(Profile("dagman", "CATEGORY", "subwf"))
         subwf_job.uses(subwf_dax)
         subwf_job.addArguments("-Dpegasus.catalog.site.file=" + os.getcwd() + "/sites.xml",
@@ -137,6 +139,12 @@ def dax(locations, elevation, out=sys.stdout):
                      "--cluster", "horizontal",
                      "--cleanup", "inplace")
         a.addDAX(subwf_job)
+
+        # add depenency for previous subworkflow
+        if prev_subwf_job:
+            a.depends(parent=prev_subwf_job, child=subwf_job)
+        prev_subwf_job = subwf_job
+
 
     # write top level DAX
     a.writeXML(out)
