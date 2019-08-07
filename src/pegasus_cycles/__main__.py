@@ -48,102 +48,105 @@ def dax(locations, elevation, out=sys.stdout):
 
     logging.info("Generate weather grids")
     weather = set()
-    for _lat, _lon in iterlocations(locations):
-        xy = closest(_lat, _lon, elevation)
-        if xy not in weather:
-            weather.add((_lat, _lon, xy))
-
-    # generate subworkflow per location
-    logging.info("Generating subworkflows")
     os.mkdir("subwfs")
     prev_subwf_job = None
 
-    for _w in weather:
-        subwf_id = "subwf_" + _w[2].replace("met", "").replace(".weather", "").replace(".", "_")
-        subwf = ADAG(subwf_id)
+    for _lat, _lon in iterlocations(locations):
+        xy = closest(_lat, _lon, elevation)
+        if xy not in weather:
+            _w = (_lat, _lon, xy)
+            weather.add(_w)
+            # GLDAS to Cycles job
+            gldas_job = gldas_to_cycles(_lat, _lon, xy)
+            a.addJob(gldas_job)
 
-        # GLDAS to Cycles job
-        subwf.addJob(gldas_to_cycles(_w[0], _w[1], _w[2]))
+            # generate subworkflow per location
+            logging.info("Generating subworkflows")
 
-        # Cycles jobs
-        for _row in itercombinations([_w]):
-            fertilizers = _row[7]
-            coordinates = _row[2]
-            id = "_".join([_row[1], _row[4], _row[5], _row[9], fertilizers[1], _row[10], _row[8], coordinates[2]])
-            unique_id = hashlib.md5(id.encode('utf-8')).hexdigest()
-            reinit_file = "baseline_cycles_reinit-" + unique_id + ".dat"
-            subwf.addJob(cycles(
-                unique_id=unique_id,
-                crop=_row[1],
-                start_planting_date=_row[4],
-                end_planting_date=_row[5],
-                planting_date_fixed=_row[9],
-                fertilizer_rate=fertilizers[1],
-                weed_fraction=_row[10],
-                forcing=_row[8],
-                weather_file=coordinates[2],
-                reinit_file=None,
-                baseline=True,
-                fertilizer_increase=False,
-                weather=_row[2]
-            ))
-            subwf.addJob(cycles(
-                unique_id=unique_id,
-                crop=_row[1],
-                start_planting_date=_row[4],
-                end_planting_date=_row[5],
-                planting_date_fixed=_row[9],
-                fertilizer_rate=fertilizers[1],
-                weed_fraction=_row[10],
-                forcing=_row[8],
-                weather_file=coordinates[2],
-                reinit_file=reinit_file,
-                baseline=False,
-                fertilizer_increase=False,
-                weather=_row[2]
-            ))
-            subwf.addJob(cycles(
-                unique_id=unique_id,
-                crop=_row[1],
-                start_planting_date=_row[4],
-                end_planting_date=_row[5],
-                planting_date_fixed=_row[9],
-                fertilizer_rate=fertilizers[1],
-                weed_fraction=_row[10],
-                forcing=_row[8],
-                weather_file=coordinates[2],
-                reinit_file=reinit_file,
-                baseline=False,
-                fertilizer_increase=True,
-                weather=_row[2]
-            ))
+            subwf_id = "subwf_" + _w[2].replace("met", "").replace(".weather", "").replace(".", "_")
+            subwf = ADAG(subwf_id)
 
-        # Cycles output parser job
-        for crop in crops:
-            subwf.addJob(cycles_output_parser(_w, crop))
+            # Cycles jobs
+            for _row in itercombinations([_w]):
+                fertilizers = _row[7]
+                coordinates = _row[2]
+                id = "_".join([_row[1], _row[4], _row[5], _row[9], fertilizers[1], _row[10], _row[8], coordinates[2]])
+                unique_id = hashlib.md5(id.encode('utf-8')).hexdigest()
+                reinit_file = "baseline_cycles_reinit-" + unique_id + ".dat"
+                subwf.addJob(cycles(
+                    unique_id=unique_id,
+                    crop=_row[1],
+                    start_planting_date=_row[4],
+                    end_planting_date=_row[5],
+                    planting_date_fixed=_row[9],
+                    fertilizer_rate=fertilizers[1],
+                    weed_fraction=_row[10],
+                    forcing=_row[8],
+                    weather_file=coordinates[2],
+                    reinit_file=None,
+                    baseline=True,
+                    fertilizer_increase=False,
+                    weather=_row[2]
+                ))
+                subwf.addJob(cycles(
+                    unique_id=unique_id,
+                    crop=_row[1],
+                    start_planting_date=_row[4],
+                    end_planting_date=_row[5],
+                    planting_date_fixed=_row[9],
+                    fertilizer_rate=fertilizers[1],
+                    weed_fraction=_row[10],
+                    forcing=_row[8],
+                    weather_file=coordinates[2],
+                    reinit_file=reinit_file,
+                    baseline=False,
+                    fertilizer_increase=False,
+                    weather=_row[2]
+                ))
+                subwf.addJob(cycles(
+                    unique_id=unique_id,
+                    crop=_row[1],
+                    start_planting_date=_row[4],
+                    end_planting_date=_row[5],
+                    planting_date_fixed=_row[9],
+                    fertilizer_rate=fertilizers[1],
+                    weed_fraction=_row[10],
+                    forcing=_row[8],
+                    weather_file=coordinates[2],
+                    reinit_file=reinit_file,
+                    baseline=False,
+                    fertilizer_increase=True,
+                    weather=_row[2]
+                ))
 
-        # write subworkflow DAX file
-        with open("subwfs/" + subwf_id + ".xml", "w") as subwf_out:
-            subwf.writeXML(subwf_out)
+            # Cycles output parser job
+            for crop in crops:
+                subwf.addJob(cycles_output_parser(_w, crop))
 
-        subwf_dax = File(subwf_id + ".xml")
-        subwf_dax.addPFN(PFN("file://" + os.getcwd() + "/subwfs/" + subwf_id + ".xml", "local"))
-        a.addFile(subwf_dax)
+            # write subworkflow DAX file
+            with open("subwfs/" + subwf_id + ".xml", "w") as subwf_out:
+                subwf.writeXML(subwf_out)
 
-        subwf_job = DAX(subwf_id + ".xml", id=subwf_id)
-        subwf_job.addProfile(Profile("dagman", "CATEGORY", "subwf"))
-        subwf_job.uses(subwf_dax)
-        subwf_job.addArguments("-Dpegasus.catalog.site.file=" + os.getcwd() + "/sites.xml",
-                     "--sites", "condor_pool",
-                     "--output-site", "local",
-                     "--cluster", "horizontal",
-                     "--cleanup", "leaf")
-        a.addDAX(subwf_job)
+            subwf_dax = File(subwf_id + ".xml")
+            subwf_dax.addPFN(PFN("file://" + os.getcwd() + "/subwfs/" + subwf_id + ".xml", "local"))
+            a.addFile(subwf_dax)
 
-        # add depenency for previous subworkflow
-        if prev_subwf_job:
-            a.depends(parent=prev_subwf_job, child=subwf_job)
-        prev_subwf_job = subwf_job
+            subwf_job = DAX(subwf_id + ".xml", id=subwf_id)
+            subwf_job.addProfile(Profile("dagman", "CATEGORY", "subwf"))
+            subwf_job.uses(File(xy), Link.INPUT)
+            subwf_job.uses(subwf_dax)
+            subwf_job.addArguments("-Dpegasus.catalog.site.file=" + os.getcwd() + "/sites.xml",
+                         "--sites", "condor_pool",
+                         "--output-site", "local",
+                         "--cluster", "horizontal",
+                         "--cleanup", "inplace")
+            a.addDAX(subwf_job)
+            a.depends(parent=gldas_job, child=subwf_job)
+
+            # add depenency for previous subworkflow
+            if prev_subwf_job:
+                a.depends(parent=prev_subwf_job, child=subwf_job)
+            prev_subwf_job = subwf_job
 
 
     # write top level DAX
