@@ -127,7 +127,7 @@ def dax(locations, elevation, out=sys.stdout):
             # Cycles output parser job
             for crop in crops:
                 subwf.addJob(cycles_output_parser(_w, crop))
-            subwf.addJob(cycles_output_parser("Peanut", crop))
+            subwf.addJob(cycles_output_parser(_w, "Peanut"))
 
             # write subworkflow DAX file
             with open(subwf_dir + "/" + subwf_id + ".xml", "w") as subwf_out:

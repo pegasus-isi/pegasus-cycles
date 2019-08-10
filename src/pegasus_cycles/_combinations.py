@@ -32,7 +32,7 @@ def itercombinations(distinct_locations):
     # dot product for fertilizers
     fertilizers = zip(nitrogen_rate, fertilizer_rate)
 
-    for row in list(
+    combinations = list(
         product(
             country,
             crops,
@@ -46,10 +46,8 @@ def itercombinations(distinct_locations):
             planting_date_fixed,
             weed_fraction,
         )
-    ):
-        yield row
-
-    for row in list(
+    )
+    peanut_combinations = list(
         product(
             country,
             ["Peanut"],
@@ -63,5 +61,8 @@ def itercombinations(distinct_locations):
             planting_date_fixed,
             weed_fraction,
         )
-    ):
+    )
+    all_combinations = combinations + peanut_combinations
+
+    for row in all_combinations:
         yield row
