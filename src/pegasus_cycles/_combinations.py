@@ -48,6 +48,7 @@ def itercombinations(distinct_locations):
         )
     ):
         yield row
+
     for row in list(
         product(
             country,

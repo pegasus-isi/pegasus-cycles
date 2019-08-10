@@ -74,6 +74,7 @@ def dax(locations, elevation, out=sys.stdout):
                 id = "_".join([_row[1], _row[4], _row[5], _row[9], fertilizers[1], _row[10], _row[8], coordinates[2]])
                 unique_id = hashlib.md5(id.encode('utf-8')).hexdigest()
                 reinit_file = "baseline_cycles_reinit-" + unique_id + ".dat"
+                # baseline job
                 subwf.addJob(cycles(
                     unique_id=unique_id,
                     crop=_row[1],
@@ -89,6 +90,7 @@ def dax(locations, elevation, out=sys.stdout):
                     fertilizer_increase=False,
                     weather=_row[2]
                 ))
+                # cycles job
                 subwf.addJob(cycles(
                     unique_id=unique_id,
                     crop=_row[1],
@@ -104,25 +106,28 @@ def dax(locations, elevation, out=sys.stdout):
                     fertilizer_increase=False,
                     weather=_row[2]
                 ))
-                subwf.addJob(cycles(
-                    unique_id=unique_id,
-                    crop=_row[1],
-                    start_planting_date=_row[4],
-                    end_planting_date=_row[5],
-                    planting_date_fixed=_row[9],
-                    fertilizer_rate=fertilizers[1],
-                    weed_fraction=_row[10],
-                    forcing=_row[8],
-                    weather_file=coordinates[2],
-                    reinit_file=reinit_file,
-                    baseline=False,
-                    fertilizer_increase=True,
-                    weather=_row[2]
-                ))
+                # fertilizer increase job
+                if _row[1] != "Peanut":
+                    subwf.addJob(cycles(
+                        unique_id=unique_id,
+                        crop=_row[1],
+                        start_planting_date=_row[4],
+                        end_planting_date=_row[5],
+                        planting_date_fixed=_row[9],
+                        fertilizer_rate=fertilizers[1],
+                        weed_fraction=_row[10],
+                        forcing=_row[8],
+                        weather_file=coordinates[2],
+                        reinit_file=reinit_file,
+                        baseline=False,
+                        fertilizer_increase=True,
+                        weather=_row[2]
+                    ))
 
             # Cycles output parser job
             for crop in crops:
                 subwf.addJob(cycles_output_parser(_w, crop))
+            subwf.addJob(cycles_output_parser("Peanut", crop))
 
             # write subworkflow DAX file
             with open(subwf_dir + "/" + subwf_id + ".xml", "w") as subwf_out:
