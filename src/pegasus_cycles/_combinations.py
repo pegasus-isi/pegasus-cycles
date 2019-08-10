@@ -6,7 +6,7 @@ country = ["South Sudan"]
 
 # "Cassava"
 # crops = ["Maize", "Sorghum", "Peanut", "Sesame", "Cassava"]
-crops = ["Maize", "Sorghum"]
+crops = ["Maize", "Sorghum", "Sesame"]
 
 soil = ["pongo.soil"]
 
@@ -31,7 +31,7 @@ weed_fraction = ["0.0", "0.05", "0.1", "0.2", "0.4", "1.5", "2.0"]
 def itercombinations(distinct_locations):
     # dot product for fertilizers
     fertilizers = zip(nitrogen_rate, fertilizer_rate)
-    
+
     for row in list(
         product(
             country,
@@ -42,6 +42,22 @@ def itercombinations(distinct_locations):
             end_planting_date,
             fertilizer,
             fertilizers,
+            forcing,
+            planting_date_fixed,
+            weed_fraction,
+        )
+    ):
+        yield row
+    for row in list(
+        product(
+            country,
+            ["Peanut"],
+            distinct_locations,
+            soil,
+            start_planting_date,
+            end_planting_date,
+            fertilizer,
+            [("0.0", "0.00")],
             forcing,
             planting_date_fixed,
             weed_fraction,
