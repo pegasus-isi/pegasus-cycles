@@ -48,7 +48,8 @@ def dax(locations, elevation, out=sys.stdout):
 
     logging.info("Generate weather grids")
     weather = set()
-    os.mkdir("subwfs")
+    subwf_dir = "subwfs"
+    os.mkdir(subwf_dir)
     prev_subwf_job = None
 
     for _lat, _lon in iterlocations(locations):
@@ -124,11 +125,11 @@ def dax(locations, elevation, out=sys.stdout):
                 subwf.addJob(cycles_output_parser(_w, crop))
 
             # write subworkflow DAX file
-            with open("subwfs/" + subwf_id + ".xml", "w") as subwf_out:
+            with open(subwf_dir + "/" + subwf_id + ".xml", "w") as subwf_out:
                 subwf.writeXML(subwf_out)
 
             subwf_dax = File(subwf_id + ".xml")
-            subwf_dax.addPFN(PFN("file://" + os.getcwd() + "/subwfs/" + subwf_id + ".xml", "local"))
+            subwf_dax.addPFN(PFN("file://" + os.getcwd() + "/" + subwf_dir + "/" + subwf_id + ".xml", "local"))
             a.addFile(subwf_dax)
 
             subwf_job = DAX(subwf_id + ".xml", id=subwf_id)
