@@ -150,8 +150,8 @@ def dax(locations, elevation, out=sys.stdout):
             a.depends(parent=gldas_job, child=subwf_job)
 
             # add depenency for previous subworkflow
-            if prev_subwf_job:
-                a.depends(parent=prev_subwf_job, child=subwf_job)
+            # if prev_subwf_job:
+            #     a.depends(parent=prev_subwf_job, child=subwf_job)
             prev_subwf_job = subwf_job
 
 
