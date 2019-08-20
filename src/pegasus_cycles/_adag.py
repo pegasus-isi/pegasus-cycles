@@ -117,18 +117,15 @@ def cycles(
     j.uses(template_op, link=Link.INPUT)
     j.uses(File(prefix + "cycles_crop-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     j.uses(File(prefix + "cycles_nitrogen-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
-    j.uses(season_output_file, link=Link.OUTPUT)
     j.uses(File(prefix + "cycles_soilProfile-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     j.uses(File(prefix + "cycles_som-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     j.uses(File(prefix + "cycles_summary-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     j.uses(File(prefix + "cycles_water-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     j.uses(File(prefix + "cycles_weatherOutput-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     if not baseline:
+        j.uses(season_output_file, link=Link.OUTPUT)
         j.uses(File(prefix + "cycles_outputs-" + unique_id + ".zip"), link=Link.OUTPUT)
-    else:
-        j.uses(File(prefix + "cycles_outputs-" + unique_id + ".zip"), link=Link.OUTPUT, transfer=False)
-    j.uses(params_file, link=Link.OUTPUT)
-    if not baseline:
+        j.uses(params_file, link=Link.OUTPUT)
         j.addArguments("--reinit-file", reinit_file)
         j.uses(File(reinit_file), Link.INPUT)
         if not fertilizer_increase:
@@ -141,6 +138,9 @@ def cycles(
             season_files[weather][crop].append(season_output_file)
             params_files[weather][crop].append(params_file)
     else:
+        j.uses(season_output_file, link=Link.OUTPUT, transfer=False)
+        j.uses(File(prefix + "cycles_outputs-" + unique_id + ".zip"), link=Link.OUTPUT, transfer=False)
+        j.uses(params_file, link=Link.OUTPUT, transfer=False)
         j.uses(File(prefix + "cycles_reinit-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     return j
 
