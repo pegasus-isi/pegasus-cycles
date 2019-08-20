@@ -47,7 +47,7 @@ def gldas_to_cycles(
     j.addArguments("--longitude", longitude)
     j.addArguments("--gldas-path", gldas_path)
     j.addArguments("--output", output_file)
-    j.uses(File(output_file), Link.OUTPUT)
+    j.uses(File(output_file), link=Link.OUTPUT, transfer=True)
     return j
 
 
@@ -109,22 +109,25 @@ def cycles(
     j.addArguments(template_weed)
     j.addArguments(template_ctrl)
     j.addArguments(template_op)
-    j.uses(File(weather_file), Link.INPUT)
-    j.uses(crops_file, Link.INPUT)
-    j.uses(soil_file, Link.INPUT)
-    j.uses(template_weed, Link.INPUT)
-    j.uses(template_ctrl, Link.INPUT)
-    j.uses(template_op, Link.INPUT)
-    j.uses(File(prefix + "cycles_crop-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(File(prefix + "cycles_nitrogen-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(season_output_file, Link.OUTPUT)
-    j.uses(File(prefix + "cycles_soilProfile-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(File(prefix + "cycles_som-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(File(prefix + "cycles_summary-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(File(prefix + "cycles_water-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(File(prefix + "cycles_weatherOutput-" + unique_id + ".dat"), Link.OUTPUT)
-    j.uses(File(prefix + "cycles_outputs-" + unique_id + ".zip"), Link.OUTPUT)
-    j.uses(params_file, Link.OUTPUT)
+    j.uses(File(weather_file), link=Link.INPUT)
+    j.uses(crops_file, link=Link.INPUT)
+    j.uses(soil_file, link=Link.INPUT)
+    j.uses(template_weed, link=Link.INPUT)
+    j.uses(template_ctrl, link=Link.INPUT)
+    j.uses(template_op, link=Link.INPUT)
+    j.uses(File(prefix + "cycles_crop-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
+    j.uses(File(prefix + "cycles_nitrogen-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
+    j.uses(season_output_file, link=Link.OUTPUT)
+    j.uses(File(prefix + "cycles_soilProfile-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
+    j.uses(File(prefix + "cycles_som-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
+    j.uses(File(prefix + "cycles_summary-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
+    j.uses(File(prefix + "cycles_water-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
+    j.uses(File(prefix + "cycles_weatherOutput-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
+    if not baseline:
+        j.uses(File(prefix + "cycles_outputs-" + unique_id + ".zip"), link=Link.OUTPUT)
+    else:
+        j.uses(File(prefix + "cycles_outputs-" + unique_id + ".zip"), link=Link.OUTPUT, transfer=False)
+    j.uses(params_file, link=Link.OUTPUT)
     if not baseline:
         j.addArguments("--reinit-file", reinit_file)
         j.uses(File(reinit_file), Link.INPUT)
@@ -138,7 +141,7 @@ def cycles(
             season_files[weather][crop].append(season_output_file)
             params_files[weather][crop].append(params_file)
     else:
-        j.uses(File(prefix + "cycles_reinit-" + unique_id + ".dat"), Link.OUTPUT)
+        j.uses(File(prefix + "cycles_reinit-" + unique_id + ".dat"), link=Link.OUTPUT, transfer=False)
     return j
 
 
@@ -155,7 +158,7 @@ def cycles_output_parser(weather, crop):
     for f in params_files[weather][crop]:
         j.addArguments("-p", f)
         j.uses(f, Link.INPUT)
-    j.uses(output_file, Link.OUTPUT)
+    j.uses(output_file, link=Link.OUTPUT, transfer=True)
     j.addArguments("--output-file", output_file)
     return j
 
