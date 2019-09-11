@@ -106,6 +106,9 @@ def _generate_inputs(
         }
         if fertilizer_increase == "True":
             op_data["fertilization_rate"] = float(op_data["fertilization_rate"]) * 1.1
+        if baseline == "True":
+            op_data["start_planting_date"] = 100
+            op_data["fertilization_rate"] = 156.25
         result = src.substitute(op_data)
         operation_contents += result + "\n"
 
