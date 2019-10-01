@@ -145,6 +145,34 @@ def cycles(
     return j
 
 
+def cycles_fertilizer_increase_output_parser(
+    unique_id,
+    crop
+):
+    """Cycles Fertilizer Increase Output Parser."""
+    j = Job("cycles_fertilizer_increase_output_parser")
+    j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;")))
+
+    # input files
+    params_file = File("cycles_params-" + unique_id + ".csv")
+    params_file_fi = File("fertilizer_increase_cycles_params-" + unique_id + ".csv")
+    season_file = File("cycles_season-" + unique_id + ".dat")
+    season_file_fi = File("fertilizer_increase_cycles_season-" + unique_id + ".dat")
+    j.addArguments("--params-file", params_file)
+    j.addArguments("--params-file-fi", params_file_fi)
+    j.addArguments("--season-file", season_file)
+    j.addArguments("--season-file-fi", season_file_fi)
+    j.uses(params_file, link=Link.INPUT)
+    j.uses(params_file_fi, link=Link.INPUT)
+    j.uses(season_file, link=Link.INPUT)
+    j.uses(season_file_fi, link=Link.INPUT)
+
+    # output file
+    output_file = File("cycles_fertilizer_increase_output_summary-" + unique_id + ".csv")
+    j.addArguments("--output-file", output_file)
+    j.uses(output_file, link=Link.OUTPUT, transfer=True)
+
+
 # @a.job()
 def cycles_output_parser(weather, crop):
     """Cycles Output Parser."""

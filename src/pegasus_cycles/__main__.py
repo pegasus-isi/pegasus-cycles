@@ -123,6 +123,10 @@ def dax(locations, elevation, out=sys.stdout):
                         fertilizer_increase=True,
                         weather=_row[2]
                     ))
+                    subwf.addJob(cycles_fertilizer_increase_output_parser(
+                        unique_id=unique_id,
+                        crop=_row[1]
+                    ))
 
             # Cycles output parser job
             for crop in crops:
