@@ -52,6 +52,7 @@ def _generate_inputs(
             'forcing',
             'season_file'
         ])
+        fertilization_rate = fertilizer_rate if fertilizer_increase == "False" else float(fertilizer_rate) * 1.1
         csvwriter.writerow([
             unique_id,
             crop,
@@ -59,7 +60,7 @@ def _generate_inputs(
             start_planting_date,
             end_planting_date,
             planting_date_fixed,
-            fertilizer_rate,
+            fertilization_rate,
             weed_fraction,
             forcing,
             "cycles_season-" + unique_id + ".dat"
