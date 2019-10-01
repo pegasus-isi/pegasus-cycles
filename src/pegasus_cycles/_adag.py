@@ -171,7 +171,8 @@ def cycles_fertilizer_increase_output_parser(
     output_file = File("cycles_fertilizer_increase_output_summary-" + unique_id + ".csv")
     j.addArguments("--output-file", output_file)
     j.uses(output_file, link=Link.OUTPUT, transfer=True)
-
+    return j
+    
 
 # @a.job()
 def cycles_output_parser(weather, crop):
