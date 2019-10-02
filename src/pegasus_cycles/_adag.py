@@ -24,9 +24,10 @@ a.addFile(template_weed)
 a.addFile(template_ctrl)
 a.addFile(template_op)
 
-# Cycles' season output files list
+# Cycles' output files list
 season_files = {}
 params_files = {}
+fi_files = {}
 
 
 # @a.job()
@@ -51,23 +52,23 @@ def gldas_to_cycles(
     return j
 
 
-@a.transformation()
-@a.resource_info(cpu=0.25)
-def baseline_transformation():
-    """Cycles Baseline Transformation."""
-    e1 = Executable("cycles-baseline")
-    return [e1]
-
-
-@a.transformation()
-@a.resource_info(cpu=0.25)
-def cycles_transformation():
-    """Cycles Transformation."""
-    e1 = Executable("cycles")
-    e1.addPFN(PFN("file://path/run", "a"))
-    e2 = Executable("io.sh")
-    e2.addPFN(PFN("file://path/io.sh", "a"))
-    return [e1, e2]
+# @a.transformation()
+# @a.resource_info(cpu=0.25)
+# def baseline_transformation():
+#     """Cycles Baseline Transformation."""
+#     e1 = Executable("cycles-baseline")
+#     return [e1]
+#
+#
+# @a.transformation()
+# @a.resource_info(cpu=0.25)
+# def cycles_transformation():
+#     """Cycles Transformation."""
+#     e1 = Executable("cycles")
+#     e1.addPFN(PFN("file://path/run", "a"))
+#     e2 = Executable("io.sh")
+#     e2.addPFN(PFN("file://path/io.sh", "a"))
+#     return [e1, e2]
 
 
 # @a.job()
@@ -147,7 +148,8 @@ def cycles(
 
 def cycles_fertilizer_increase_output_parser(
     unique_id,
-    crop
+    crop,
+    weather=None
 ):
     """Cycles Fertilizer Increase Output Parser."""
     j = Job("cycles_fertilizer_increase_output_parser")
@@ -168,11 +170,36 @@ def cycles_fertilizer_increase_output_parser(
     j.uses(season_file_fi, link=Link.INPUT)
 
     # output file
-    output_file = File("cycles_fertilizer_increase_output_summary-" + unique_id + ".csv")
+    output_file = File("cycles_fertilizer_increase_output_parsed-" + unique_id + ".csv")
     j.addArguments("--output-file", output_file)
-    j.uses(output_file, link=Link.OUTPUT, transfer=True)
+    j.uses(output_file, link=Link.OUTPUT, transfer=False)
+    if weather not in fi_files:
+        fi_files[weather] = {}
+    if crop not in fi_files[weather]:
+        fi_files[weather][crop] = []
+    fi_files[weather][crop].append(output_file)
+
     return j
-    
+
+
+def cycles_fertilizer_increase_output_summary(weather, crop):
+    """Cycles Output Summary."""
+    if weather not in fi_files or crop not in fi_files[weather]: #temp
+        return
+    j = Job("cycles_fertilizer_increase_output_summary")
+    j.addProfile(Profile(Namespace.CONDOR, key="+SingularityImage", value=html.unescape("&quot;/cvmfs/singularity.opensciencegrid.org/mintproject/cycles:0.9.4-alpha&quot;")))
+
+    # inputs
+    for f in fi_files[weather][crop]:
+        j.addArguments("-p", f)
+        j.uses(f, Link.INPUT)
+
+    # output
+    output_file = File("cycles_fi_output_summary_" + crop.lower() + "_" + weather[2].replace("met", "").replace(".weather", "") + ".csv")
+    j.uses(output_file, link=Link.OUTPUT, transfer=True)
+    j.addArguments("--output-file", output_file)
+    return j
+
 
 # @a.job()
 def cycles_output_parser(weather, crop):
@@ -192,31 +219,31 @@ def cycles_output_parser(weather, crop):
     return j
 
 
-@a.transformation()
-@a.resource_info(cpu=0.25)
-def merge_transformation():
-    """Cycles Baseline Transformation."""
-    e1 = Executable("merge")
-    e1.addPFN(PFN("file://path/run", "a"))
-    return e1
-
-
-@a.job()
-def merge():
-    """Merge."""
-    return Job("merge")
-
-
-@a.transformation()
-@a.resource_info(cpu=0.25)
-def visualize_transformation():
-    """Cycles Baseline Transformation."""
-    e1 = Executable("visualize")
-    e1.addPFN(PFN("file://path/run", "a"))
-    return e1
-
-
-@a.job()
-def visualize():
-    """Cycles Visualize."""
-    return Job("visualize")
+# @a.transformation()
+# @a.resource_info(cpu=0.25)
+# def merge_transformation():
+#     """Cycles Baseline Transformation."""
+#     e1 = Executable("merge")
+#     e1.addPFN(PFN("file://path/run", "a"))
+#     return e1
+#
+#
+# @a.job()
+# def merge():
+#     """Merge."""
+#     return Job("merge")
+#
+#
+# @a.transformation()
+# @a.resource_info(cpu=0.25)
+# def visualize_transformation():
+#     """Cycles Baseline Transformation."""
+#     e1 = Executable("visualize")
+#     e1.addPFN(PFN("file://path/run", "a"))
+#     return e1
+#
+#
+# @a.job()
+# def visualize():
+#     """Cycles Visualize."""
+#     return Job("visualize")

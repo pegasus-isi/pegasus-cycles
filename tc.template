@@ -42,6 +42,14 @@ tr cycles_fertilizer_increase_output_parser {
   site condor_pool {
     type "STAGEABLE"
     pfn "file://$work_dir/bin/cycles-fertilizer-increase-output-parser.py"
+    profile pegasus "clusters.size" "20"
+  }
+}
+
+tr cycles_fertilizer_increase_output_summary {
+  site condor_pool {
+    type "STAGEABLE"
+    pfn "file://$work_dir/bin/cycles-fertilizer-increase-output-summary.py"
     profile pegasus "clusters.size" "1"
   }
 }

@@ -125,12 +125,14 @@ def dax(locations, elevation, out=sys.stdout):
                     ))
                     subwf.addJob(cycles_fertilizer_increase_output_parser(
                         unique_id=unique_id,
-                        crop=_row[1]
+                        crop=_row[1],
+                        weather=_row[2]
                     ))
 
             # Cycles output parser job
             for crop in crops:
                 subwf.addJob(cycles_output_parser(_w, crop))
+                subwf.addJob(cycles_fertilizer_increase_output_summary(_w, crop))
             subwf.addJob(cycles_output_parser(_w, "Peanut"))
 
             # write subworkflow DAX file
